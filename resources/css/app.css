@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos padrão */
+/* Importações de fontes e outros estilos aqui */
+
+/* Estilos para telas pequenas */
+@media (max-width: 767px) {
+  .tw-min-h-screen {
+    min-height: 100vh;
+  }
+
+  .tw-flex-1 {
+    flex-basis: 100%;
+  }
+
+  .tw-flex-row {
+    flex-direction: column;
+  }
+
+  .tw-max-w-screen {
+    max-width: 100%;
+  }
+
+  .tw-overflow-x-hidden,
+  .tw-overflow-y-hidden {
+    overflow: auto;
+  }
+
+  .tw-p-4 {
+    padding: 1rem; /* Reduz o espaçamento para telas pequenas */
+  }
+}
+
+/* Estilos para telas médias */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tw-p-4 {
+    padding: 2rem; /* Ajusta o espaçamento para telas médias */
+  }
+}
+
+/* Estilos para telas grandes */
+@media (min-width: 1024px) {
+  .tw-p-4 {
+    padding: 3rem; /* Ajusta o espaçamento para telas grandes */
+  }
+}
+

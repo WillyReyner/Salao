@@ -1,0 +1,1 @@
+import{l as o}from"./logo-efg-4f53c449.js";import{_ as t}from"./_plugin-vue_export-helper-c27b6911.js";import{o as c,f as r}from"./app-4ab3c1a7.js";const s={},e={src:o,class:"tw-h-12 tw-w-auto"};function n(a,_){return c(),r("img",e)}const p=t(s,[["render",n]]);export{p as A};

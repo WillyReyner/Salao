@@ -1,0 +1,264 @@
+<script setup>
+import { ref, computed } from 'vue';
+import ApplicationLogo from '@/Components/Pages/ApplicationLogo.vue';
+import Dropdown from '@/Components/Pages/Dropdown.vue';
+import DropdownLink from '@/Components/Pages/DropdownLink.vue';
+import DropdownSidebar from '@/Components/Painel/DropdownSidebar.vue';
+import DropdownSidebarLink from '@/Components/Painel/DropdownSidebarLink.vue';
+import SidebarLink from './SidebarLink.vue';
+import { Link, usePage, router } from '@inertiajs/vue3';
+import { Icon } from '@iconify/vue'
+import PrimaryButton from "@/Components/Pages/PrimaryButton.vue";
+import DropdownMenuLink from "@/Components/LandingPag/DropdownMenuLink.vue";
+const page = usePage();
+const user = computed(() => page.props.auth.user)
+const roles = user.value.roles;
+const permissions = roles.map(role => role.permissions).flat();
+const hasPermission = (permission) => {
+    return permissions.some(userPermission => userPermission.name === permission);
+};
+const showMenu = ref(false);
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) {
+        showMenu.value = false
+    } else {
+        showMenu.value = true
+    }
+})
+
+const openTeste = ref(false)
+
+</script>
+
+<template>
+    <nav class="tw-border-b tw-border-gray-100 tw-flex tw-flex-col tw-bg-white tw-shadow-lg tw-overflow-x-hidden tw-transition-all"
+        :class="showMenu ? 'tw-w-[100px]' : 'tw-w-[200px]'">
+        <div class="tw-flex tw-flex-1 tw-flex-col lg:tw-py-3">
+            <div class="tw-flex tw-flex-1 tw-flex-col tw-justify-between">
+                <div class="tw-flex tw-items-center tw-px-7">
+                    <Link :href="route('dashboard')" v-if="!showMenu">
+                    <ApplicationLogo class="tw-block tw-h-11 tw-w-auto tw-fill-current tw-text-gray-800 tw-pr-4" />
+                    </Link>
+                    <div class="tw-flex  tw-items-center">
+                        <button @click="showMenu = !showMenu" title="Diminuir/Expandir Menu Lateral"
+                            class="tw-inline-flex tw-items-center tw-justify-center tw-rounded-md tw-text-gray-400 hover:tw-text-gray-500 hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-bg-gray-100 focus:tw-text-gray-500 tw-transition tw-duration-150 tw-ease-in-out">
+                            <svg v-if="showMenu" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                                viewBox="0 0 32 32" fill="none">
+                                <path d="M9.33337 16L18.6667 16M18.6667 16L14.6667 20M18.6667 16L14.6667 12"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M22.6666 21.3333L22.6666 10.6666" stroke="#666666" stroke-width="1.5"
+                                    stroke-linecap="round" />
+                                <path
+                                    d="M2.66663 16C2.66663 9.71457 2.66663 6.57187 4.61925 4.61925C6.57187 2.66663 9.71457 2.66663 16 2.66663C22.2854 2.66663 25.4281 2.66663 27.3807 4.61925C29.3333 6.57187 29.3333 9.71457 29.3333 16C29.3333 22.2854 29.3333 25.4281 27.3807 27.3807C25.4281 29.3333 22.2854 29.3333 16 29.3333C9.71457 29.3333 6.57187 29.3333 4.61925 27.3807C2.66663 25.4281 2.66663 22.2854 2.66663 16Z"
+                                    stroke="#666666" stroke-width="1.5" />
+                            </svg>
+                            <svg v-if="!showMenu" xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                                viewBox="0 0 30 30" fill="none">
+                                <path d="M21.25 15L12.5 15M12.5 15L16.25 18.75M12.5 15L16.25 11.25" stroke="#666666"
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M8.75 20L8.75 10" stroke="#666666" stroke-width="1.5" stroke-linecap="round" />
+                                <path
+                                    d="M2.5 15C2.5 9.10744 2.5 6.16117 4.33058 4.33058C6.16117 2.5 9.10744 2.5 15 2.5C20.8926 2.5 23.8388 2.5 25.6694 4.33058C27.5 6.16117 27.5 9.10744 27.5 15C27.5 20.8926 27.5 23.8388 25.6694 25.6694C23.8388 27.5 20.8926 27.5 15 27.5C9.10744 27.5 6.16117 27.5 4.33058 25.6694C2.5 23.8388 2.5 20.8926 2.5 15Z"
+                                    stroke="#666666" stroke-width="1.5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="tw-h-[2px] tw-w-[calc(100%-48px)] tw-bg-gray-100 tw-my-7 tw-mx-6"></div>
+                <div class="tw-flex tw-flex-1 tw-flex-col tw-justify-between">
+                    <!-- Navigation Links -->
+                    <div class="tw-flex tw-flex-1 tw-flex-col tw-overflow-y-scroll">
+                        <SidebarLink v-if="!showMenu" :href="route('dashboard')" :active="route().current('dashboard')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M11.275 3.5502L4.5375 8.8002C3.4125 9.6752 2.5 11.5377 2.5 12.9502V22.2127C2.5 25.1127 4.8625 27.4877 7.7625 27.4877H22.2375C25.1375 27.4877 27.5 25.1127 27.5 22.2252V13.1252C27.5 11.6127 26.4875 9.6752 25.25 8.8127L17.525 3.4002C15.775 2.1752 12.9625 2.2377 11.275 3.5502Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 22.4873V18.7373V22.4873Z" fill="#666666" />
+                                <path d="M15 22.4873V18.7373" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>&nbsp;
+                            Início
+                        </SidebarLink>
+                        <SidebarLink v-if="showMenu" :href="route('dashboard')" :active="route().current('dashboard')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M11.275 3.5502L4.5375 8.8002C3.4125 9.6752 2.5 11.5377 2.5 12.9502V22.2127C2.5 25.1127 4.8625 27.4877 7.7625 27.4877H22.2375C25.1375 27.4877 27.5 25.1127 27.5 22.2252V13.1252C27.5 11.6127 26.4875 9.6752 25.25 8.8127L17.525 3.4002C15.775 2.1752 12.9625 2.2377 11.275 3.5502Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 22.4873V18.7373V22.4873Z" fill="#666666" />
+                                <path d="M15 22.4873V18.7373" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>&nbsp;
+                        </SidebarLink>
+                        <span v-if="(hasPermission('Sidebar Editais') || hasPermission('Sidebar Inscricoes')) && !showMenu"
+                            class="flex tw-text-body tw-text-gray-600 tw-text-sm tw-font-thin tw-mt-6"
+                            :class="showMenu ? 'tw-opacity-0 tw-px-0' : 'tw-opacity-100 tw-px-6'">CONTROLE
+                        </span>
+                        <SidebarLink v-if="(hasPermission('Sidebar Editais') && hasPermission('Index Editais')) && !showMenu"
+                            :href="route('painel.editais')" :active="route().current('painel.editais')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5">
+                                    <path
+                                        d="M4 21.4V2.6a.6.6 0 0 1 .6-.6h11.652a.6.6 0 0 1 .424.176l3.148 3.148A.6.6 0 0 1 20 5.75V21.4a.6.6 0 0 1-.6.6H4.6a.6.6 0 0 1-.6-.6ZM8 10h8m-8 8h8m-8-4h4" />
+                                    <path d="M16 2v3.4a.6.6 0 0 0 .6.6H20" />
+                                </g>
+                            </svg>
+	                        &nbsp;&nbsp;Editais
+                        </SidebarLink>
+                        <SidebarLink v-if="(hasPermission('Sidebar Editais') && hasPermission('Index Editais')) && showMenu"
+                            :href="route('painel.editais')" :active="route().current('painel.editais')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="1.5">
+                                    <path
+                                        d="M4 21.4V2.6a.6.6 0 0 1 .6-.6h11.652a.6.6 0 0 1 .424.176l3.148 3.148A.6.6 0 0 1 20 5.75V21.4a.6.6 0 0 1-.6.6H4.6a.6.6 0 0 1-.6-.6ZM8 10h8m-8 8h8m-8-4h4" />
+                                    <path d="M16 2v3.4a.6.6 0 0 0 .6.6H20" />
+                                </g>
+                            </svg>&nbsp;
+                        </SidebarLink>
+                        <SidebarLink v-if="(hasPermission('Sidebar Inscricoes') && hasPermission('Index Inscricoes')) && !showMenu"
+                            :href="route('painel.inscricoes')" :active="route().current('painel.inscricoes')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M25 10.3125V22.5C25 26.25 22.7625 27.5 20 27.5H10C7.2375 27.5 5 26.25 5 22.5V10.3125C5 6.25 7.2375 5.3125 10 5.3125C10 6.0875 10.3125 6.7875 10.825 7.3C11.3375 7.8125 12.0375 8.125 12.8125 8.125H17.1875C18.7375 8.125 20 6.8625 20 5.3125C22.7625 5.3125 25 6.25 25 10.3125Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M20 5.3125C20 6.8625 18.7375 8.125 17.1875 8.125H12.8125C12.0375 8.125 11.3375 7.8125 10.825 7.3C10.3125 6.7875 10 6.0875 10 5.3125C10 3.7625 11.2625 2.5 12.8125 2.5H17.1875C17.9625 2.5 18.6625 2.8125 19.175 3.325C19.6875 3.8375 20 4.5375 20 5.3125Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M10 16.25H15" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M10 21.25H20" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+	                        &nbsp;&nbsp;Inscrições
+                        </SidebarLink>
+                        <SidebarLink v-if="(hasPermission('Sidebar Inscricoes') && hasPermission('Index Inscricoes')) && showMenu"
+                            :href="route('painel.inscricoes')" :active="route().current('painel.inscricoes')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M25 10.3125V22.5C25 26.25 22.7625 27.5 20 27.5H10C7.2375 27.5 5 26.25 5 22.5V10.3125C5 6.25 7.2375 5.3125 10 5.3125C10 6.0875 10.3125 6.7875 10.825 7.3C11.3375 7.8125 12.0375 8.125 12.8125 8.125H17.1875C18.7375 8.125 20 6.8625 20 5.3125C22.7625 5.3125 25 6.25 25 10.3125Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M20 5.3125C20 6.8625 18.7375 8.125 17.1875 8.125H12.8125C12.0375 8.125 11.3375 7.8125 10.825 7.3C10.3125 6.7875 10 6.0875 10 5.3125C10 3.7625 11.2625 2.5 12.8125 2.5H17.1875C17.9625 2.5 18.6625 2.8125 19.175 3.325C19.6875 3.8375 20 4.5375 20 5.3125Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M10 16.25H15" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M10 21.25H20" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>&nbsp;
+                        </SidebarLink>
+                        <span v-if="(hasPermission('Sidebar Cursos') || hasPermission('Sidebar Turmas')) && !showMenu"
+                            class="flex tw-text-body tw-text-gray-600 tw-text-sm tw-font-thin tw-mt-6"
+                            :class="showMenu ? 'tw-opacity-0 tw-px-0' : 'tw-opacity-100 tw-px-6'">ADMINISTRAÇÃO
+                        </span>
+                        <SidebarLink v-if="(hasPermission('Sidebar Cursos') && hasPermission('Index Cursos')) && !showMenu" :href="route('painel.cursos')"
+                            :active="route().current('painel.cursos')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M27.5 20.9251V5.83761C27.5 4.33761 26.275 3.22511 24.7875 3.35011H24.7125C22.0875 3.57511 18.1 4.91261 15.875 6.31261L15.6625 6.45011C15.3 6.67511 14.7 6.67511 14.3375 6.45011L14.025 6.26261C11.8 4.87511 7.825 3.55011 5.2 3.33761C3.7125 3.21261 2.5 4.33761 2.5 5.82511V20.9251C2.5 22.1251 3.475 23.2501 4.675 23.4001L5.0375 23.4501C7.75 23.8126 11.9375 25.1876 14.3375 26.5001L14.3875 26.5251C14.725 26.7126 15.2625 26.7126 15.5875 26.5251C17.9875 25.2001 22.1875 23.8126 24.9125 23.4501L25.325 23.4001C26.525 23.2501 27.5 22.1251 27.5 20.9251Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 6.8623V25.6123V6.8623Z" fill="#666666" />
+                                <path d="M15 6.8623V25.6123" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M9.6875 10.6123H6.875" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M10.625 14.3623H6.875" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>&nbsp;
+                            Cursos
+                        </SidebarLink>
+                        <SidebarLink v-if="(hasPermission('Sidebar Cursos') && hasPermission('Index Cursos')) && showMenu" :href="route('painel.cursos')"
+                            :active="route().current('painel.cursos')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M27.5 20.9251V5.83761C27.5 4.33761 26.275 3.22511 24.7875 3.35011H24.7125C22.0875 3.57511 18.1 4.91261 15.875 6.31261L15.6625 6.45011C15.3 6.67511 14.7 6.67511 14.3375 6.45011L14.025 6.26261C11.8 4.87511 7.825 3.55011 5.2 3.33761C3.7125 3.21261 2.5 4.33761 2.5 5.82511V20.9251C2.5 22.1251 3.475 23.2501 4.675 23.4001L5.0375 23.4501C7.75 23.8126 11.9375 25.1876 14.3375 26.5001L14.3875 26.5251C14.725 26.7126 15.2625 26.7126 15.5875 26.5251C17.9875 25.2001 22.1875 23.8126 24.9125 23.4501L25.325 23.4001C26.525 23.2501 27.5 22.1251 27.5 20.9251Z"
+                                    stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M15 6.8623V25.6123V6.8623Z" fill="#666666" />
+                                <path d="M15 6.8623V25.6123" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M9.6875 10.6123H6.875" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                                <path d="M10.625 14.3623H6.875" stroke="#666666" stroke-width="1.5" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>&nbsp;
+                        </SidebarLink>
+                        <SidebarLink v-if="(hasPermission('Sidebar Turmas') && hasPermission('Index Turmas')) && !showMenu" :href="route('painel.turmas')"
+                            :active="route().current('painel.turmas')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+                                <path
+                                    d="M11.4495 13.5875C11.3245 13.575 11.1745 13.575 11.037 13.5875C8.06196 13.4875 5.69946 11.05 5.69946 8.05C5.69946 4.9875 8.17446 2.5 11.2495 2.5C14.312 2.5 16.7995 4.9875 16.7995 8.05C16.787 11.05 14.4245 13.4875 11.4495 13.5875Z"
+                                    stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M20.5128 5C22.9378 5 24.8878 6.9625 24.8878 9.375C24.8878 11.7375 23.0128 13.6625 20.6753 13.75C20.5753 13.7375 20.4628 13.7375 20.3503 13.75"
+                                    stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M5.19966 18.2C2.17466 20.225 2.17466 23.525 5.19966 25.5375C8.63716 27.8375 14.2747 27.8375 17.7122 25.5375C20.7372 23.5125 20.7372 20.2125 17.7122 18.2C14.2872 15.9125 8.64966 15.9125 5.19966 18.2Z"
+                                    stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path
+                                    d="M22.925 25C23.825 24.8125 24.675 24.45 25.375 23.9125C27.325 22.45 27.325 20.0375 25.375 18.575C24.6875 18.05 23.85 17.7 22.9625 17.5"
+                                    stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg> &nbsp;
+                            Turmas
+                        </SidebarLink>
+	                     <span v-if="(hasPermission('Sidebar Stai') || hasPermission('Index Stai')) && !showMenu"
+	                          class="flex tw-text-body tw-text-gray-600 tw-text-sm tw-font-thin tw-mt-6"
+	                          :class="showMenu ? 'tw-opacity-0 tw-px-0' : 'tw-opacity-100 tw-px-6'">STAI
+	                     </span>
+	                    <SidebarLink v-if="(hasPermission('Sidebar Stai') || hasPermission('Index Stai')) && !showMenu" :href="route('painel.stai.editais')"
+	                                 :active="route().current('painel.stai.editais')">
+		                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+			                    <g id="note-2">
+				                    <path id="Vector" d="M27.0752 13.0501L25.8502 18.2751C24.8002 22.7876 22.7252 24.6126 18.8252 24.2376C18.2002 24.1876 17.5252 24.0751 16.8002 23.9001L14.7002 23.4001C9.48772 22.1626 7.87522 19.5876 9.10022 14.3626L10.3252 9.12513C10.5752 8.06263 10.8752 7.13763 11.2502 6.37513C12.7127 3.35013 15.2002 2.53763 19.3752 3.52513L21.4627 4.01263C26.7002 5.23763 28.3002 7.82513 27.0752 13.0501Z" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_2" d="M18.8249 24.2375C18.0499 24.7625 17.0749 25.2 15.8874 25.5875L13.9124 26.2375C8.94994 27.8375 6.33744 26.5 4.72494 21.5375L3.12494 16.6C1.52494 11.6375 2.84994 9.0125 7.81244 7.4125L9.78744 6.7625C10.2999 6.6 10.7874 6.4625 11.2499 6.375C10.8749 7.1375 10.5749 8.0625 10.3249 9.125L9.09994 14.3625C7.87494 19.5875 9.48744 22.1625 14.6999 23.4L16.7999 23.9C17.5249 24.075 18.1999 24.1875 18.8249 24.2375Z" fill="#666666" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_3" d="M15.8008 10.6621L21.8633 12.1996" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_4" d="M14.5742 15.5L18.1992 16.425" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+			                    </g>
+		                    </svg>
+		                    &nbsp;&nbsp;Editais
+	                    </SidebarLink>
+	                    <SidebarLink v-if="(hasPermission('Sidebar Stai') || hasPermission('Index Stai')) && showMenu" :href="route('painel.stai.editais')"
+	                                 :active="route().current('painel.stai.editais')">
+		                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+			                    <g id="note-2">
+				                    <path id="Vector" d="M27.0752 13.0501L25.8502 18.2751C24.8002 22.7876 22.7252 24.6126 18.8252 24.2376C18.2002 24.1876 17.5252 24.0751 16.8002 23.9001L14.7002 23.4001C9.48772 22.1626 7.87522 19.5876 9.10022 14.3626L10.3252 9.12513C10.5752 8.06263 10.8752 7.13763 11.2502 6.37513C12.7127 3.35013 15.2002 2.53763 19.3752 3.52513L21.4627 4.01263C26.7002 5.23763 28.3002 7.82513 27.0752 13.0501Z" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_2" d="M18.8249 24.2375C18.0499 24.7625 17.0749 25.2 15.8874 25.5875L13.9124 26.2375C8.94994 27.8375 6.33744 26.5 4.72494 21.5375L3.12494 16.6C1.52494 11.6375 2.84994 9.0125 7.81244 7.4125L9.78744 6.7625C10.2999 6.6 10.7874 6.4625 11.2499 6.375C10.8749 7.1375 10.5749 8.0625 10.3249 9.125L9.09994 14.3625C7.87494 19.5875 9.48744 22.1625 14.6999 23.4L16.7999 23.9C17.5249 24.075 18.1999 24.1875 18.8249 24.2375Z" fill="#666666" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_3" d="M15.8008 10.6621L21.8633 12.1996" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_4" d="M14.5742 15.5L18.1992 16.425" stroke="#666666" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+			                    </g>
+		                    </svg>
+	                    </SidebarLink>
+	                    <SidebarLink v-if="(hasPermission('Sidebar Stai') || hasPermission('Index Stai')) && !showMenu" :href="route('painel.stai.agendamento')"
+	                                 :active="route().current('painel.stai.agendamento')">
+		                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+			                    <g id="clock">
+				                    <path id="Vector" d="M15 12.0742V15.5617L16.75 17.3117" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_2" d="M6.875 15C6.875 10.5125 10.5125 6.875 15 6.875C19.4875 6.875 23.125 10.5125 23.125 15C23.125 17.6 21.9 19.925 20 21.4125H19.9875C18.6125 22.4875 16.8875 23.125 15 23.125C13.1375 23.125 11.425 22.5 10.05 21.4375H10.0375C8.1125 19.95 6.875 17.625 6.875 15Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_3" d="M10.0371 21.4371H10.0496C11.4246 22.4996 13.1371 23.1246 14.9996 23.1246C16.8871 23.1246 18.6121 22.4871 19.9871 21.4121H19.9996L19.3621 24.4996C18.7496 26.8746 17.3746 27.4996 15.6871 27.4996H14.3246C12.6371 27.4996 11.2496 26.8746 10.6496 24.4871L10.0371 21.4371Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_4" d="M10.0371 8.5625H10.0496C11.4246 7.5 13.1371 6.875 14.9996 6.875C16.8871 6.875 18.6121 7.5125 19.9871 8.5875H19.9996L19.3621 5.5C18.7496 3.125 17.3746 2.5 15.6871 2.5H14.3246C12.6371 2.5 11.2496 3.125 10.6496 5.5125L10.0371 8.5625Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+			                    </g>
+		                    </svg>
+		                    &nbsp;&nbsp;Agendamentos
+	                    </SidebarLink>
+	                    <SidebarLink v-if="(hasPermission('Sidebar Stai') || hasPermission('Index Stai')) && showMenu" :href="route('painel.stai.agendamento')" :active="route().current('painel.stai.agendamento')">
+		                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+			                    <g id="clock">
+				                    <path id="Vector" d="M15 12.0742V15.5617L16.75 17.3117" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_2" d="M6.875 15C6.875 10.5125 10.5125 6.875 15 6.875C19.4875 6.875 23.125 10.5125 23.125 15C23.125 17.6 21.9 19.925 20 21.4125H19.9875C18.6125 22.4875 16.8875 23.125 15 23.125C13.1375 23.125 11.425 22.5 10.05 21.4375H10.0375C8.1125 19.95 6.875 17.625 6.875 15Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_3" d="M10.0371 21.4371H10.0496C11.4246 22.4996 13.1371 23.1246 14.9996 23.1246C16.8871 23.1246 18.6121 22.4871 19.9871 21.4121H19.9996L19.3621 24.4996C18.7496 26.8746 17.3746 27.4996 15.6871 27.4996H14.3246C12.6371 27.4996 11.2496 26.8746 10.6496 24.4871L10.0371 21.4371Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+				                    <path id="Vector_4" d="M10.0371 8.5625H10.0496C11.4246 7.5 13.1371 6.875 14.9996 6.875C16.8871 6.875 18.6121 7.5125 19.9871 8.5875H19.9996L19.3621 5.5C18.7496 3.125 17.3746 2.5 15.6871 2.5H14.3246C12.6371 2.5 11.2496 3.125 10.6496 5.5125L10.0371 8.5625Z" stroke="#666666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+			                    </g>
+		                    </svg>
+	                    </SidebarLink>
+                    </div>
+	                 <div class="tw-flex tw-flex-col">
+                    <div class="tw-px-6">
+                        <div class="tw-h-[2px] tw-w-full tw-bg-gray-100 tw-my-7"></div>
+                        <img src="./../../../imgs/logo-efg-small.png" class="tw-h-8 tw-w-8" />
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</template>
