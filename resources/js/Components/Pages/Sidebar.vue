@@ -21,9 +21,7 @@ function logout(){
 
 <template>
     <nav class="tw-max-h-screen tw-border-b tw-border-gray-100 tw-flex tw-flex-col tw-bg-white tw-shadow-lg tw-overflow-x-hidden tw-overflow-scroll tw-transition-all" :class="showMenu ? 'tw-w-[90px]' : 'tw-w-[264px]'" >
-        
         <div class="tw-flex tw-flex-1 tw-flex-col lg:tw-py-8">
-           
                 <div class="tw-flex tw-flex-1 tw-flex-col tw-justify-between">
                 
                     <div class="tw-flex tw-justify-between tw-items-center tw-mb-2 tw-px-6">

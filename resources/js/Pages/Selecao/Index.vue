@@ -1,3 +1,298 @@
+<script setup>
+import {Head, Link, useForm} from "@inertiajs/vue3";
+import SelecaoLayout from '@/Layouts/SelecaoLayout.vue';
+import PrimaryButton from "@/Components/Pages/PrimaryButton.vue";
+import {ref} from "vue";
+import Card from "@/Components/Selecao/Card.vue";
+import {Icon} from "@iconify/vue";
+import {computed} from "vue";
+import InputLabel from "@/Components/Pages/InputLabel.vue";
+import InputError from "@/Components/Pages/InputError.vue";
+import {evaCloseCircleOutline} from "@quasar/extras/eva-icons"
+import {Notify} from 'quasar';
+import axios from 'axios';
+
+const props = defineProps({
+	escolas: {
+		type: Array,
+		default: [],
+	},
+	municipios: {
+		type: Array,
+		default: []
+	},
+})
+
+const estagios = [
+	{titulo: '', subtitulo: ''}, //Home
+	{titulo: 'Selecione o local que deseja estudar', subtitulo: 'ONDE VOCÊ QUER ESTUDAR?'},
+	{titulo: 'Selecione o curso de seu interesse', subtitulo: 'CURSOS'},
+	{titulo: 'Formulário de Inscrição ', subtitulo: 'Dados Pessoais'},
+	{titulo: 'Formulário de Inscrição ', subtitulo: 'Endereço'},
+	{titulo: 'Formulário de Inscrição ', subtitulo: 'Antes de finalizar sua inscrição, confira seus dados até o final.'},
+	{titulo: 'Formulário de Inscrição ', subtitulo: 'Obrigado.'},
+
+]
+
+const filtersModal = ref(false)
+const deleteModal = ref(false)
+const openPresencial = ref(false)
+const secondDialog = ref(false)
+const estagio = ref(0)
+
+// Cursos
+const filtroTipo = ref([])
+const filtroModalidade = ref([])
+const filtroTurno = ref([])
+
+function closeModal() {
+	filtersModal.value = false
+}
+
+function irDadosPessoais(estagioId) {
+	secondDialog.value = true;
+	// Definir secondDialog.value como false após 3 segundos
+	setTimeout(function () {
+		secondDialog.value = false;
+		estagio.value = estagioId
+	}, 500); // 3000 milissegundos = 3 segundos
+}
+
+function avancar() {
+	secondDialog.value = true;
+	// Definir secondDialog.value como false após 3 segundos
+	setTimeout(function () {
+		secondDialog.value = false;
+		estagio.value = estagio.value + 1
+	}, 500); // 3000 milissegundos = 3 segundos
+
+}
+
+function voltar() {
+	estagio.value = estagio.value - 1
+}
+
+//Passo1
+const localSelected = ref('');
+const escolaSelected = ref('')
+const curso = ref([])
+const habilitacao_item = ref('')
+
+function localSelecionado(modalidade) {
+	return localSelected.value === modalidade;
+}
+
+function toogleLocal(mod, mod1) {
+	localSelected.value = mod;
+}
+
+function selecionarLocal() {
+	axios.post(route('inscricao.estagio_1'), {localSelected: localSelected.value})
+		 .then((res) => {
+			 curso.value = res.data.curso;
+			 estagio.value += 1;
+		 })
+		 .catch((err) => {
+			 Notify.create({
+				 message: "Não foi possível realizar a sua inscrição. Verifique suas informações.",
+				 color: "negative"
+			 });
+			 estagio.value = 1;
+		 });
+}
+
+const filtroLocal = ref('')
+
+const passaFiltroLocal = (nomeCurso) => {
+	const lowerCaseFiltro = filtroLocal.value.toLowerCase();
+	return lowerCaseFiltro === '' || nomeCurso.toLowerCase().includes(lowerCaseFiltro);
+};
+
+//Passo2
+const open = ref('');
+const filtroCurso = ref('')
+const optionsDoc = ['CPF', 'RG', 'CNH', 'Passaporte (pass.te)']
+
+const passaFiltroCurso = (nomeCurso) => {
+	const lowerCaseFiltro = filtroCurso.value.toLowerCase();
+	return lowerCaseFiltro === '' || nomeCurso.toLowerCase().includes(lowerCaseFiltro);
+};
+
+const masks = {
+	CPF: '###.###.###-##',
+	RG: '##.###.###-#',
+	CNH: '############',
+};
+
+const getMaskForTipoDoc = (tipoDoc) => {
+	return masks[tipoDoc] || '';
+};
+
+const cursoSelected = ref('')
+
+function openItem(item) {
+	if (open.value == item) {
+		open.value = null;
+	} else {
+		open.value = item;
+	}
+}
+
+//
+const formattedDate = (dateString) => {
+	const options = {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	};
+	const date = new Date(dateString);
+	return date.toLocaleDateString("pt-BR", options);
+};
+
+//Passo4
+const lgpd = ref(false)
+const estados = [
+	'AC - Acre',
+	'AL - Alagoas',
+	'AP - Amapá',
+	'AM - Amazonas',
+	'BA - Bahia',
+	'CE - Ceará',
+	'DF - Distrito Federal',
+	'ES - Espírito Santo',
+	'GO - Goías',
+	'MA - Maranhão',
+	'MT - Mato Grosso',
+	'MS - Mato Grosso do Sul',
+	'MG - Minas Gerais',
+	'PA - Pará',
+	'PB - Paraíba',
+	'PR - Paraná',
+	'PE - Pernambuco',
+	'PI - Piauí',
+	'RJ - Rio de Janeiro',
+	'RN - Rio Grande do Norte',
+	'RS - Rio Grande do Sul',
+	'RO - Rondônia',
+	'RR - Roraíma',
+	'SC - Santa Catarina',
+	'SP - São Paulo',
+	'SE - Sergipe',
+	'TO - Tocantins'
+];
+
+const form = useForm({
+	nome_completo: '',
+	cpf: '',
+	nome_mae: '',
+	telefone: '',
+	telefone_alternativo: '',
+	data_nascimento: '',
+	email: '',
+	email_confirmation: '',
+	cep: '',
+	estado: '',
+	municipio: '',
+	bairro: '',
+	logradouro: '',
+	numero: '',
+	complemento: '',
+	turma_id: '',
+	tipo_documento: '',
+	documento: '',
+	lgpd: '',
+	habilitacao_item: []
+});
+
+function store() {
+
+	form.turma_id = cursoSelected;
+	form.post(route('inscricao.store'), {
+		preserveScroll: true,
+		forceFormData: true,
+		onSuccess: (res) => {
+			form.reset();
+			Notify.create({
+				message: "Inscrição realizada com sucesso.",
+				color: "secondary"
+			});
+			estagio.value = 6;
+		},
+		onError: (err) => {
+			Notify.create({
+				message: "Não foi possível realizar a sua inscrição. Verifique suas informações.",
+				color: "negative"
+			});
+			estagio.value = 9; // Redireciona de volta à etapa 9 em caso de erro
+		}
+	});
+}
+
+const validateEmail = (email) => {
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	return emailRegex.test(email);
+};
+const validateEmailFields = () => {
+	const isEmailValid = validateEmail(form.email);
+	const isConfirmationValid = validateEmail(form.email_confirmation);
+	if (!isEmailValid) {
+		form.errors.email = 'Por favor, insira um e-mail válido.';
+	} else {
+		form.errors.email = '';
+	}
+	if (!isConfirmationValid) {
+		form.errors.email_confirmation = 'Por favor, insira um e-mail de confirmação válido.';
+	} else {
+		form.errors.email_confirmation = '';
+	}
+};
+
+async function buscarEnderecoPorCEP() {
+	const cep = form.cep.replace(/\D/g, '')
+	if (cep.length === 8) {
+		try {
+			const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+			const data = response.data;
+			if (!data.erro) {
+				form.estado = data.uf;
+				form.municipio = data.localidade;
+				form.bairro = data.bairro;
+				form.logradouro = data.logradouro;
+				form.numero = '';
+				form.complemento = '';
+			} else {
+				console.error('CEP não encontrado ou inválido.');
+			}
+		} catch (error) {
+			console.error('Erro ao buscar o CEP:', error);
+		}
+	}
+}
+
+function isCPF(cpf) {
+	cpf = cpf.replace(/\D/g, '');
+	if (cpf.toString().length != 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+	var result = true;
+	[9, 10].forEach(function (j) {
+		var soma = 0, r;
+		cpf.split(/(?=)/).splice(0, j).forEach(function (e, i) {
+			soma += parseInt(e) * ((j + 2) - (i + 1));
+		});
+		r = soma % 11;
+		r = (r < 2) ? 0 : 11 - r;
+		if (r != cpf.substring(j, j + 1)) result = false;
+	});
+	return result;
+}
+
+const cpfRules = [
+	(v) => !!v || 'CPF é obrigatório',
+	(v) => isCPF(v) || 'CPF inválido',
+];
+</script>
+
 <template>
 	<Head title="Sistema de Seleção"/>
 	<SelecaoLayout>
@@ -621,297 +916,3 @@
 		</div>
 	</SelecaoLayout>
 </template>
-<script setup>
-import {Head, Link, useForm} from "@inertiajs/vue3";
-import SelecaoLayout from '@/Layouts/SelecaoLayout.vue';
-import PrimaryButton from "@/Components/Pages/PrimaryButton.vue";
-import {ref} from "vue";
-import Card from "@/Components/Selecao/Card.vue";
-import {Icon} from "@iconify/vue";
-import {computed} from "vue";
-import InputLabel from "@/Components/Pages/InputLabel.vue";
-import InputError from "@/Components/Pages/InputError.vue";
-import {evaCloseCircleOutline} from "@quasar/extras/eva-icons"
-import {Notify} from 'quasar';
-import axios from 'axios';
-
-const props = defineProps({
-	escolas: {
-		type: Array,
-		default: [],
-	},
-	municipios: {
-		type: Array,
-		default: []
-	},
-})
-
-const estagios = [
-	{titulo: '', subtitulo: ''}, //Home
-	{titulo: 'Selecione o local que deseja estudar', subtitulo: 'ONDE VOCÊ QUER ESTUDAR?'},
-	{titulo: 'Selecione o curso de seu interesse', subtitulo: 'CURSOS'},
-	{titulo: 'Formulário de Inscrição ', subtitulo: 'Dados Pessoais'},
-	{titulo: 'Formulário de Inscrição ', subtitulo: 'Endereço'},
-	{titulo: 'Formulário de Inscrição ', subtitulo: 'Antes de finalizar sua inscrição, confira seus dados até o final.'},
-	{titulo: 'Formulário de Inscrição ', subtitulo: 'Obrigado.'},
-
-]
-
-const filtersModal = ref(false)
-const deleteModal = ref(false)
-const openPresencial = ref(false)
-const secondDialog = ref(false)
-const estagio = ref(0)
-
-// Cursos
-const filtroTipo = ref([])
-const filtroModalidade = ref([])
-const filtroTurno = ref([])
-
-function closeModal() {
-	filtersModal.value = false
-}
-
-function irDadosPessoais(estagioId) {
-	secondDialog.value = true;
-	// Definir secondDialog.value como false após 3 segundos
-	setTimeout(function () {
-		secondDialog.value = false;
-		estagio.value = estagioId
-	}, 500); // 3000 milissegundos = 3 segundos
-}
-
-function avancar() {
-	secondDialog.value = true;
-	// Definir secondDialog.value como false após 3 segundos
-	setTimeout(function () {
-		secondDialog.value = false;
-		estagio.value = estagio.value + 1
-	}, 500); // 3000 milissegundos = 3 segundos
-
-}
-
-function voltar() {
-	estagio.value = estagio.value - 1
-}
-
-//Passo1
-const localSelected = ref('');
-const escolaSelected = ref('')
-const curso = ref([])
-const habilitacao_item = ref('')
-
-function localSelecionado(modalidade) {
-	return localSelected.value === modalidade;
-}
-
-function toogleLocal(mod, mod1) {
-	localSelected.value = mod;
-}
-
-function selecionarLocal() {
-	axios.post(route('inscricao.estagio_1'), {localSelected: localSelected.value})
-		 .then((res) => {
-			 curso.value = res.data.curso;
-			 estagio.value += 1;
-		 })
-		 .catch((err) => {
-			 Notify.create({
-				 message: "Não foi possível realizar a sua inscrição. Verifique suas informações.",
-				 color: "negative"
-			 });
-			 estagio.value = 1;
-		 });
-}
-
-const filtroLocal = ref('')
-
-const passaFiltroLocal = (nomeCurso) => {
-	const lowerCaseFiltro = filtroLocal.value.toLowerCase();
-	return lowerCaseFiltro === '' || nomeCurso.toLowerCase().includes(lowerCaseFiltro);
-};
-
-//Passo2
-const open = ref('');
-const filtroCurso = ref('')
-const optionsDoc = ['CPF', 'RG', 'CNH', 'Passaporte (pass.te)']
-
-const passaFiltroCurso = (nomeCurso) => {
-	const lowerCaseFiltro = filtroCurso.value.toLowerCase();
-	return lowerCaseFiltro === '' || nomeCurso.toLowerCase().includes(lowerCaseFiltro);
-};
-
-const masks = {
-	CPF: '###.###.###-##',
-	RG: '##.###.###-#',
-	CNH: '############',
-};
-
-const getMaskForTipoDoc = (tipoDoc) => {
-	return masks[tipoDoc] || '';
-};
-
-const cursoSelected = ref('')
-
-function openItem(item) {
-	if (open.value == item) {
-		open.value = null;
-	} else {
-		open.value = item;
-	}
-}
-
-//
-const formattedDate = (dateString) => {
-	const options = {
-		day: "2-digit",
-		month: "2-digit",
-		year: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	};
-	const date = new Date(dateString);
-	return date.toLocaleDateString("pt-BR", options);
-};
-
-//Passo4
-const lgpd = ref(false)
-const estados = [
-	'AC - Acre',
-	'AL - Alagoas',
-	'AP - Amapá',
-	'AM - Amazonas',
-	'BA - Bahia',
-	'CE - Ceará',
-	'DF - Distrito Federal',
-	'ES - Espírito Santo',
-	'GO - Goías',
-	'MA - Maranhão',
-	'MT - Mato Grosso',
-	'MS - Mato Grosso do Sul',
-	'MG - Minas Gerais',
-	'PA - Pará',
-	'PB - Paraíba',
-	'PR - Paraná',
-	'PE - Pernambuco',
-	'PI - Piauí',
-	'RJ - Rio de Janeiro',
-	'RN - Rio Grande do Norte',
-	'RS - Rio Grande do Sul',
-	'RO - Rondônia',
-	'RR - Roraíma',
-	'SC - Santa Catarina',
-	'SP - São Paulo',
-	'SE - Sergipe',
-	'TO - Tocantins'
-];
-
-const form = useForm({
-	nome_completo: '',
-	cpf: '',
-	nome_mae: '',
-	telefone: '',
-	telefone_alternativo: '',
-	data_nascimento: '',
-	email: '',
-	email_confirmation: '',
-	cep: '',
-	estado: '',
-	municipio: '',
-	bairro: '',
-	logradouro: '',
-	numero: '',
-	complemento: '',
-	turma_id: '',
-	tipo_documento: '',
-	documento: '',
-	lgpd: '',
-	habilitacao_item: []
-});
-
-function store() {
-
-	form.turma_id = cursoSelected;
-	form.post(route('inscricao.store'), {
-		preserveScroll: true,
-		forceFormData: true,
-		onSuccess: (res) => {
-			form.reset();
-			Notify.create({
-				message: "Inscrição realizada com sucesso.",
-				color: "secondary"
-			});
-			estagio.value = 6;
-		},
-		onError: (err) => {
-			Notify.create({
-				message: "Não foi possível realizar a sua inscrição. Verifique suas informações.",
-				color: "negative"
-			});
-			estagio.value = 9; // Redireciona de volta à etapa 9 em caso de erro
-		}
-	});
-}
-
-const validateEmail = (email) => {
-	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	return emailRegex.test(email);
-};
-const validateEmailFields = () => {
-	const isEmailValid = validateEmail(form.email);
-	const isConfirmationValid = validateEmail(form.email_confirmation);
-	if (!isEmailValid) {
-		form.errors.email = 'Por favor, insira um e-mail válido.';
-	} else {
-		form.errors.email = '';
-	}
-	if (!isConfirmationValid) {
-		form.errors.email_confirmation = 'Por favor, insira um e-mail de confirmação válido.';
-	} else {
-		form.errors.email_confirmation = '';
-	}
-};
-
-async function buscarEnderecoPorCEP() {
-	const cep = form.cep.replace(/\D/g, '')
-	if (cep.length === 8) {
-		try {
-			const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
-			const data = response.data;
-			if (!data.erro) {
-				form.estado = data.uf;
-				form.municipio = data.localidade;
-				form.bairro = data.bairro;
-				form.logradouro = data.logradouro;
-				form.numero = '';
-				form.complemento = '';
-			} else {
-				console.error('CEP não encontrado ou inválido.');
-			}
-		} catch (error) {
-			console.error('Erro ao buscar o CEP:', error);
-		}
-	}
-}
-
-function isCPF(cpf) {
-	cpf = cpf.replace(/\D/g, '');
-	if (cpf.toString().length != 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-	var result = true;
-	[9, 10].forEach(function (j) {
-		var soma = 0, r;
-		cpf.split(/(?=)/).splice(0, j).forEach(function (e, i) {
-			soma += parseInt(e) * ((j + 2) - (i + 1));
-		});
-		r = soma % 11;
-		r = (r < 2) ? 0 : 11 - r;
-		if (r != cpf.substring(j, j + 1)) result = false;
-	});
-	return result;
-}
-
-const cpfRules = [
-	(v) => !!v || 'CPF é obrigatório',
-	(v) => isCPF(v) || 'CPF inválido',
-];
-</script>

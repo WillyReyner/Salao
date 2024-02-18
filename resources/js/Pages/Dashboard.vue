@@ -10,7 +10,7 @@ import { Head } from '@inertiajs/vue3';
 
     <AuthenticatedLayout>
         <div class="tw-py-12">
-            <div class="tw-max-w-7xl tw-mx-auto sm:tw-px-6 lg:tw-px-8 tw-overflow-y-scroll">
+            <div class="tw-mx-auto sm:tw-px-6 lg:tw-px-8 tw-overflow-y-scroll tw-w-auto">
                 <div class="tw-overflow-hidden">
                     <img src="./../../imgs/logo-efg.png" alt="Content">
                 </div>

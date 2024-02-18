@@ -2,8 +2,8 @@
     <div>
         <Head title="Dashboard" />
         <q-dialog v-model="boasVindas">
-            <div class="tw-p-20 tw-flex-col tw-bg-white tw-rounded-2xl tw-justify-center tw-items-center tw-shadow-md">
-                <div class="tw-overflow-hidden tw-justify-center tw-text-center tw-gap-6 tw-flex tw-flex-1 tw-flex-col">
+            <div class="tw-px-20 tw-p-[25px] tw-flex-col tw-bg-white tw-rounded-2xl tw-justify-center tw-items-center tw-shadow-md">
+                <div class="tw-flex tw-flex-1 tw-flex-col tw-overflow-hidden tw-justify-center tw-text-center tw-gap-4">
                     <h2 class="tw-font-body tw-font-bold tw-text-xl tw-text-primary">
                         Bem vindo(a), {{ page.props.auth.user.name }}, à Escola do Futuro de Goiás
                     </h2>
